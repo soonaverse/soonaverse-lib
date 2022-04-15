@@ -34,7 +34,7 @@ Add script within your html
 ```
 Get NFT owner by IOTA Address
 ```
-window.soon.getIotaAddressNfts([
+window.soon.getNftsByIotaAddress([
     'iota1qryv5aqy0p7lcr7djn8fea9cl4rqqv3xxcqah0erc2gdee3czm6wcmln3fp'
 ]).then((obj) => {
   console.log('NFTs owned by IOTA Address')
@@ -64,7 +64,7 @@ Google Firestore is used in a similar way GraphQL would be used in other DeFi pr
 ### GET: getNftsByIotaAddress
 Find all NFT IOTA Address owns. You can pass an array with up to 10 IOTA Addresses.
 ```
-getIotaAddressNfts([
+getNftsByIotaAddress([
     'iota1qryv5aqy0p7lcr7djn8fea9cl4rqqv3xxcqah0erc2gdee3czm6wcmln3fp'
 ]).then((obj) => {
   console.log('NFTs owned by IOTA Address')
