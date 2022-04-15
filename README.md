@@ -52,7 +52,7 @@ Google Firestore stays in place to provide highly performant and scalable layer 
 
 Two different tools exists:
 - Tangle Listener -> custom plugin connected with Hornet that streams near real-time information about Tangle into Google Firestore
-- Wasp Listener -> custom pluging connected to Wasp that streams near real-time information from the L2 chain
+- Wasp Listener -> custom plugin connected to Wasp that streams near real-time information from the L2 chain
 - Google Cloud Functions (serverless) -> Centralised contracts (functions/typescript) that executes business process and write results to Google Firestore
 
 Google Firestore is used in a similar way GraphQL would be used in other DeFi projects. Google Firestore is used instead of GraphQL due it's highly performant and scalable attributes.
