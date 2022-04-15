@@ -4,7 +4,7 @@
 
 Soonaverse library to interact with Soonaverse platform. 
 
-Primarely to read data from Soonaverase. Eventually we will provide web component integrated into web3 that can be embeeded on another sites.
+At this stage it only supports reading or streaming data from Soonaverase. Eventually we will provide web components that can be embeded on another sites.
 
 ## Getting Started
 
@@ -14,9 +14,10 @@ Install NPM package
 npm install soonaverse --save
 ```
 
-Initial class and call required functions. See API below for full list of commands:
+Initiate class and get NFTs owned by IOTA Address. 
+See API for full list of commands below:
 ```
-import { Soon } from '../dist/index';
+import { Soon } from 'soonaverse';
 
 const soon = new Soon();
 soon.getNftsByIotaAddress('0x551FD2C7c7bF356baC194587dAb2fcd46420054b').then((obj) => {
@@ -24,14 +25,13 @@ soon.getNftsByIotaAddress('0x551FD2C7c7bF356baC194587dAb2fcd46420054b').then((ob
 });
 ```
 
-### Use JS script to your app directly
+### Use JS script directly in your app
 Add script within your html
 ```
 <script src="https://cdn.jsdelivr.net/npm/soonaverse@latest/dist/soon.js"></script>
 
 // We initiate Soon class to window.soon
 ```
-
 Get NFT owner by IOTA Address
 ```
 window.soon.getIotaAddressNfts([
@@ -52,8 +52,8 @@ Google Firestore stays in place to provide highly performant and scalable layer 
 
 Two different tools exists:
 - Tangle Listener -> custom plugin connected with Hornet that streams near real-time information about Tangle into Google Firestore
-- Wasp Listener -> custom plugin connected to Wasp that streams near real-time information from the L2 chain
-- Google Cloud Functions (serverless) -> Centralised contracts (functions/typescript) that executes business process and write results to Google Firestore
+- Wasp Listener -> custom plugin connected to Wasp that streams near real-time information from the L2 chain into Google Firestore.
+- Google Cloud Functions (serverless) -> Centralised contracts (typescript) that executes business processes and write results into Google Firestore
 
 Google Firestore is used in a similar way GraphQL would be used in other DeFi projects. Google Firestore is used instead of GraphQL due it's highly performant and scalable attributes.
 
