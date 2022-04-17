@@ -20,7 +20,7 @@ See API for full list of commands below:
 import { Soon } from 'soonaverse';
 
 const soon = new Soon();
-soon.getNftsByIotaAddress('0x551FD2C7c7bF356baC194587dAb2fcd46420054b').then((obj) => {
+soon.getNftsByIotaAddress('iota1qryv5aqy0p7lcr7djn8fea9cl4rqqv3xxcqah0erc2gdee3czm6wcmln3fp').then((obj) => {
     console.log(obj);
 });
 ```
