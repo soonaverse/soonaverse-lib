@@ -2,7 +2,7 @@
 
 # Soonaverse - Soonaverse JavaScript/Typescript API
 
-Soonaverse library to interact with Soonaverse platform. 
+Library to interact with Soonaverse platform. 
 
 At this stage it only supports reading or streaming data from Soonaverase. Eventually we will provide web components that can be embeded on another sites.
 
@@ -51,8 +51,8 @@ Centralized contracts are slowly being replaced by Solidity Smart Contract as te
 Google Firestore stays in place to provide highly performant and scalable layer to read data. 
 
 Two different tools exists:
-- Tangle Listener -> custom plugin connected with Hornet that streams near real-time information about Tangle into Google Firestore
-- Wasp Listener -> custom plugin connected to Wasp that streams near real-time information from the L2 chain into Google Firestore.
+- Tangle Listener -> custom component connected with Hornet that streams near real-time information about Tangle into Google Firestore
+- Wasp Listener -> custom component connected to Wasp that streams near real-time information from the L2 chain into Google Firestore.
 - Google Cloud Functions (serverless) -> Centralised contracts (typescript) that executes business processes and write results into Google Firestore
 
 Google Firestore is used in a similar way GraphQL would be used in other DeFi projects. Google Firestore is used instead of GraphQL due it's highly performant and scalable attributes.
@@ -62,7 +62,7 @@ Google Firestore is used in a similar way GraphQL would be used in other DeFi pr
 ## API
 
 ### GET: getNftsByIotaAddress
-Find all NFT IOTA Address owns. You can pass an array with up to 10 IOTA Addresses.
+Get all NFTs owned by an IOTA Address. You can pass an array with up to 10 IOTA Addresses.
 ```
 getNftsByIotaAddress([
     'iota1qryv5aqy0p7lcr7djn8fea9cl4rqqv3xxcqah0erc2gdee3czm6wcmln3fp'
@@ -81,7 +81,7 @@ getNftsByEthAddress('0x551FD2C7c7bF356baC194587dAb2fcd46420054b').then((obj) => 
 ```
 
 ### LISTEN: onNft
-Listen to updates on a particular NFT. RXJS Observable stream is returned.
+Listen to updates for a particular NFT. RXJS Observable stream is returned.
 
 ```
 (<any>window).soon.onNft('0xa16722921cf0aa33ccc0d36bdff057dece5dc7ae').subscribe((obj) => {
