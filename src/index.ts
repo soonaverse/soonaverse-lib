@@ -1,9 +1,9 @@
 import { Observable } from 'rxjs';
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { Firestore } from 'firebase/firestore'
+import { Firestore, limit } from 'firebase/firestore'
 import { getFirestore, collection, getDocs, getDoc, doc, 
          DocumentData, CollectionReference, query, where, onSnapshot } from 'firebase/firestore';
-import { TransactionType } from './interfaces/models';
+import { Transaction, TransactionType } from './interfaces/models';
 import { COL } from './interfaces/models/base';
 import { Nft } from './interfaces/models/nft';
 
@@ -72,6 +72,32 @@ export class Soon {
       };
     });
   }
+
+  /**
+   * Listen to all new payments on Soonaverse
+   * 
+   * @return Nft Latest NFT record.
+   */
+  public onValidPayment(): Observable<Transaction[]> {
+    return new Observable((observe) => {
+      const q = query(
+        this.transactionRef(),
+        where('type', '==', TransactionType.PAYMENT),
+        where('payload.invalidPayment', '==', false),
+        limit(1)
+      );
+
+      const unsub = onSnapshot(q, { includeMetadataChanges: true }, (nftSnapshot) => {
+        observe.next(<Transaction[]>nftSnapshot.docs.map(doc => doc.data()));
+      });
+
+      // Provide a way of canceling and disposing the interval resource
+      return function unsubscribe() {
+        unsub();
+      };
+    });
+  }
+
 
   /**
    * Get all NFTs owned by IOTA address

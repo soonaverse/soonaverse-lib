@@ -27,3 +27,8 @@ const soon = new Soon();
 // (<any>window).soon.onNft('0xa16722921cf0aa33ccc0d36bdff057dece5dc7ae').subscribe((obj) => {
 //     console.log(obj);
 // });
+
+// // Listen to payments
+// (<any>window).soon.onValidPayment().subscribe((obj) => {
+//     console.log(obj);
+// });

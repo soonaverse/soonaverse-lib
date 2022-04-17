@@ -84,8 +84,19 @@ getNftsByEthAddress('0x551FD2C7c7bF356baC194587dAb2fcd46420054b').then((obj) => 
 Listen to updates for a particular NFT. RXJS Observable stream is returned.
 
 ```
-(<any>window).soon.onNft('0xa16722921cf0aa33ccc0d36bdff057dece5dc7ae').subscribe((obj) => {
+onNft('0xa16722921cf0aa33ccc0d36bdff057dece5dc7ae').subscribe((obj) => {
     console.log('NFT Updated')
+    console.log(obj);
+});
+
+```
+
+### LISTEN: onValidPayment
+Listen to ALL valid payments on Soonaverse.
+
+```
+onValidPayment().subscribe((obj) => {
+    console.log('Payment')
     console.log(obj);
 });
 
