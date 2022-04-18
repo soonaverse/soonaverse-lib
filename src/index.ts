@@ -3,7 +3,7 @@ import { initializeApp, FirebaseApp } from 'firebase/app';
 import { Firestore, limit } from 'firebase/firestore'
 import { getFirestore, collection, getDocs, getDoc, doc, 
          DocumentData, CollectionReference, query, where, onSnapshot } from 'firebase/firestore';
-import { Transaction, TransactionType } from './interfaces/models';
+import { Collection, Transaction, TransactionType } from './interfaces/models';
 import { COL } from './interfaces/models/base';
 import { Nft } from './interfaces/models/nft';
 
@@ -24,6 +24,10 @@ export class Soon {
     }
   }
 
+  private collectionRef(): CollectionReference<DocumentData> {
+    return collection(this.db(), COL.COLLECTION);
+  }
+
   private nftRef(): CollectionReference<DocumentData> {
     return collection(this.db(), COL.NFT);
   }
@@ -41,6 +45,17 @@ export class Soon {
     const nftDoc = doc(this.nftRef(), nftId.toLowerCase());
     const nftSnapshot = await getDoc(nftDoc);
     return <Nft>nftSnapshot.data();
+  }
+
+  /**
+   * Get current Collection record.
+   * 
+   * @returns Collection
+   */
+  public async getCollection(collection: string): Promise<Collection> {
+    const collectionDoc = doc(this.collectionRef(), collection.toLowerCase());
+    const collectionSnapshot = await getDoc(collectionDoc);
+    return <Collection>collectionSnapshot.data();
   }
 
   /**
@@ -64,6 +79,24 @@ export class Soon {
     return new Observable((observe) => {
       const unsub = onSnapshot(doc(this.nftRef(), nftId.toLowerCase()), { includeMetadataChanges: true }, (o) => {
         observe.next(<Nft|undefined>o.data());
+      });
+
+      // Provide a way of canceling and disposing the interval resource
+      return function unsubscribe() {
+        unsub();
+      };
+    });
+  }
+
+  /**
+   * Listen to changes on a particular Collection
+   * 
+   * @return Collection Latest Collection record.
+   */
+  public onCollection(collectionId: string): Observable<Collection|undefined> {
+    return new Observable((observe) => {
+      const unsub = onSnapshot(doc(this.nftRef(), collectionId.toLowerCase()), { includeMetadataChanges: true }, (o) => {
+        observe.next(<Collection|undefined>o.data());
       });
 
       // Provide a way of canceling and disposing the interval resource

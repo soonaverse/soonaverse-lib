@@ -80,12 +80,39 @@ getNftsByEthAddress('0x551FD2C7c7bF356baC194587dAb2fcd46420054b').then((obj) => 
 });
 ```
 
+### GET: getNft
+Get NFT
+```
+getNft('0xa16722921cf0aa33ccc0d36bdff057dece5dc7ae').then((obj) => {
+  console.log(obj);
+});
+```
+
+### GET: getCollection
+Get Collection
+```
+getCollection('0xcbe28532602d67eec7c937c0037509d426f38223').then((obj) => {
+  console.log(obj);
+});
+```
+
 ### LISTEN: onNft
 Listen to updates for a particular NFT. RXJS Observable stream is returned.
 
 ```
 onNft('0xa16722921cf0aa33ccc0d36bdff057dece5dc7ae').subscribe((obj) => {
     console.log('NFT Updated')
+    console.log(obj);
+});
+
+```
+
+### LISTEN: onCollection
+Listen to updates for a particular Collection. RXJS Observable stream is returned.
+
+```
+onCollection('0xcbe28532602d67eec7c937c0037509d426f38223').subscribe((obj) => {
+    console.log('Collection Updated')
     console.log(obj);
 });
 
