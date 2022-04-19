@@ -48,6 +48,18 @@ export class Soon {
   }
 
   /**
+   * Get all NFTs for the given collection ids.
+   * 
+   * @returns Collection
+   */
+   public async getNftsByCollections(collectionIds: string[]): Promise<Nft[]> {
+    const nftDoc = query(this.nftRef(), where('collection', 'in', collectionIds));
+    const nftSnapshot = await getDocs(nftDoc);
+    const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
+    return nftList;
+  }
+
+  /**
    * Get current Collection record.
    * 
    * @returns Collection
