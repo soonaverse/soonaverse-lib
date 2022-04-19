@@ -96,6 +96,14 @@ getCollection('0xcbe28532602d67eec7c937c0037509d426f38223').then((obj) => {
 });
 ```
 
+### GET: getNftsByCollections
+Get NFTs within Collection
+```
+getNftsByCollections(['0xc9813fa99b4b5a7f0e18e912bf726730bc633c17']).then((obj) => {
+  console.log(obj);
+});
+```
+
 ### LISTEN: onNft
 Listen to updates for a particular NFT. RXJS Observable stream is returned.
 
