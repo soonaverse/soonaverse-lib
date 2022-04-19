@@ -32,3 +32,8 @@ const soon = new Soon();
 // (<any>window).soon.onValidPayment().subscribe((obj) => {
 //     console.log(obj);
 // });
+
+// Get NFTs by collection
+// soon.getNftsByCollections(['0xc9813fa99b4b5a7f0e18e912bf726730bc633c17']).then((obj) => {
+//     console.log(obj);
+// });

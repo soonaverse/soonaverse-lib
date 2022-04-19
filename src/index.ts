@@ -57,7 +57,7 @@ export class Soon {
       throw new Error('Max 10 collections can be queried at once.');
     }
 
-    const nftDoc = query(this.nftRef(), where('collection', 'in', collectionIds), where("hidden", "==", "false"),);
+    const nftDoc = query(this.nftRef(), where("hidden", "==", false), where('collection', 'in', collectionIds));
     const nftSnapshot = await getDocs(nftDoc);
     const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
     return nftList;
