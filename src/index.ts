@@ -64,7 +64,7 @@ export class Soon {
    * @returns Nft[] Array of all nfts.
    */
   public async getNftsByEthAddress(ethAddress: string): Promise<Nft[]> {
-    const q = query(this.nftRef(), where('owner', '==', ethAddress.toLowerCase()));
+    const q = query(this.nftRef(), where('hidden', '==', false), where('owner', '==', ethAddress.toLowerCase()));
     const nftSnapshot = await getDocs(q);
     const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
     return nftList;

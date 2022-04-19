@@ -13,8 +13,8 @@ const soon = new Soon();
 //     console.log(obj);
 // });
 
-// // Adam_unchained wallet as test 0x551FD2C7c7bF356baC194587dAb2fcd46420054b
-// soon.getEthAddressNfts('0x551FD2C7c7bF356baC194587dAb2fcd46420054b').then((obj) => {
+// Adam_unchained wallet as test 0x551FD2C7c7bF356baC194587dAb2fcd46420054b
+// soon.getNftsByEthAddress('0x551FD2C7c7bF356baC194587dAb2fcd46420054b').then((obj) => {
 //     console.log(obj);
 // });
 
