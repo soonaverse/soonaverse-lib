@@ -53,7 +53,11 @@ export class Soon {
    * @returns Collection
    */
    public async getNftsByCollections(collectionIds: string[]): Promise<Nft[]> {
-    const nftDoc = query(this.nftRef(), where('collection', 'in', collectionIds));
+    if (collectionIds.length > 10) {
+      throw new Error('Max 10 collections can be queried at once.');
+    }
+
+    const nftDoc = query(this.nftRef(), where('collection', 'in', collectionIds), where("hidden", "==", "false"),);
     const nftSnapshot = await getDocs(nftDoc);
     const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
     return nftList;
