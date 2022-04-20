@@ -6,6 +6,8 @@ import { getFirestore, collection, getDocs, getDoc, doc,
 import { Collection, Transaction, TransactionType } from './interfaces/models';
 import { COL } from './interfaces/models/base';
 import { Nft } from './interfaces/models/nft';
+import { Member } from './interfaces/models/member';
+import * as _ from 'underscore';
 
 /**
  * Public class to interact with Soonaverse.
@@ -28,9 +30,15 @@ export class Soon {
     return collection(this.db(), COL.COLLECTION);
   }
 
+  private memberRef(): CollectionReference<DocumentData> {
+    return collection(this.db(), COL.MEMBER);
+  }
+
   private nftRef(): CollectionReference<DocumentData> {
     return collection(this.db(), COL.NFT);
   }
+
+  // participants
 
   private transactionRef(): CollectionReference<DocumentData> {
     return collection(this.db(), COL.TRANSACTION);
@@ -61,6 +69,45 @@ export class Soon {
     const nftSnapshot = await getDocs(nftDoc);
     const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
     return nftList;
+  }
+
+  /**
+   * Get ranking for the given collection ids.
+   * 
+   * @returns Collection
+   */
+   public async getRankingByCollections(collectionIds: string[], top: number): Promise<any> {
+    if (collectionIds.length > 10) {
+      throw new Error('Max 10 collections can be queried at once.');
+    }
+
+    const nftDoc = query(this.nftRef(), where("hidden", "==", false), where('collection', 'in', collectionIds));
+    const nftSnapshot = await getDocs(nftDoc);
+    const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
+
+    var ranking = _.chain(_.countBy(nftList, function(nft){ return nft.owner || ''; })).map(function(count, uid) {
+      return {
+          uid: uid,
+          count: count
+      }
+    }).sortBy('count').reverse().value().slice(0, top);
+
+    const members = <string[]>ranking.map(member => member.uid);
+
+    let memberList:any[] = new Array();
+
+    await Promise.all(members.map(async (uid) => {
+      const memberDoc = doc(this.memberRef(), uid);
+      const memberSnapshot = await getDoc(memberDoc);
+      let { name } = <Member>memberSnapshot.data()
+      memberList.push({ uid, name });
+    }));
+
+    memberList.forEach(member => {
+      Object.assign(ranking.find((ranking) => ranking.uid === member.uid), member);
+    });
+
+    return ranking;
   }
 
   /**
