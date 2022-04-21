@@ -81,14 +81,18 @@ export class Soon {
       throw new Error('Max 10 collections can be queried at once.');
     }
 
+    if (top > 50) {
+      throw new Error('Max top 50 can be queried.');
+    }
+
     const nftDoc = query(this.nftRef(), where("hidden", "==", false), where('collection', 'in', collectionIds));
     const nftSnapshot = await getDocs(nftDoc);
     const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
 
     var ranking = _.chain(_.countBy(nftList, function(nft){ return nft.owner || ''; })).map(function(count, uid) {
       return {
-          uid: uid,
-          count: count
+          count: count,
+          uid: uid
       }
     }).sortBy('count').reverse().value().slice(0, top);
 
