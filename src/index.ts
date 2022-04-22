@@ -6,6 +6,7 @@ import { getFirestore, collection, getDocs, getDoc, doc,
 import { Collection, Transaction, TransactionType } from './interfaces/models';
 import { COL } from './interfaces/models/base';
 import { Nft } from './interfaces/models/nft';
+import { Member } from './interfaces/models/member';
 
 /**
  * Public class to interact with Soonaverse.
@@ -28,9 +29,15 @@ export class Soon {
     return collection(this.db(), COL.COLLECTION);
   }
 
+  private memberRef(): CollectionReference<DocumentData> {
+    return collection(this.db(), COL.MEMBER);
+  }
+
   private nftRef(): CollectionReference<DocumentData> {
     return collection(this.db(), COL.NFT);
   }
+
+  // participants
 
   private transactionRef(): CollectionReference<DocumentData> {
     return collection(this.db(), COL.TRANSACTION);
@@ -61,6 +68,70 @@ export class Soon {
     const nftSnapshot = await getDocs(nftDoc);
     const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
     return nftList;
+  }
+
+  /**
+   * Get ranking for the given collection ids.
+   * 
+   * @returns Collection
+   */
+   public async getRankingByCollections(collectionIds: string[], top: number): Promise<any> {
+    if (collectionIds.length > 10) {
+      throw new Error('Max 10 collections can be queried at once.');
+    }
+
+    const nftDoc = query(this.nftRef(), where("hidden", "==", false), where('collection', 'in', collectionIds));
+    const nftSnapshot = await getDocs(nftDoc);
+    const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
+
+    let ranking = nftList.reduce((accumulator, { owner }) => {
+      const uid = owner || '';
+
+      if (accumulator.find(record => record.uid === owner) === undefined) {
+        accumulator.push({ uid, count: 0, rank: undefined });
+      }
+
+      let record = accumulator.find(record => record.uid === owner);
+
+      if (record !== undefined) {
+        record.count++;
+      }
+
+      return accumulator;
+    }, Array<{ count: number; uid: string; rank?: number; }> ());
+
+    ranking = ranking.sort((a, b) => b.count - a.count).slice(0, top);
+
+    const memberUidChunks = ranking.reduce((accumulator, { uid }, currentIndex) => {
+      const index = Math.floor(currentIndex / 10);
+
+      accumulator[index] ??= [];
+      accumulator[index].push(uid);
+
+      return accumulator;
+    }, Array<Array<string>> ());
+    
+    let members:any[] = new Array();
+
+    await Promise.all(memberUidChunks.map(async (uid) => {
+      const memberDoc = query(this.memberRef(), where('uid', 'in', uid));
+      const memberSnapshot = await getDocs(memberDoc);
+      const memberList = <Member[]>memberSnapshot.docs.map(doc => doc.data());
+
+      memberList.forEach(member => {
+        members.push({ uid: member.uid, member: member.name });
+      });
+    }));
+
+    members.forEach(member => {
+      Object.assign(ranking.find((ranking) => ranking.uid === member.uid), member);
+    });
+
+    ranking.forEach((record, index) =>  {
+      record.rank = index + 1;
+    });
+
+    return ranking;
   }
 
   /**
