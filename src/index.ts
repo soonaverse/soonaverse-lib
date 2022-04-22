@@ -88,7 +88,7 @@ export class Soon {
       const uid = owner || '';
 
       if (accumulator.find(record => record.uid === owner) === undefined) {
-        accumulator.push({ uid, count: 1, rank: undefined });
+        accumulator.push({ uid, count: 0, rank: undefined });
       }
 
       let record = accumulator.find(record => record.uid === owner);
