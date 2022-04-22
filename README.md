@@ -1,6 +1,8 @@
 [![npm](https://img.shields.io/npm/v/soonaverse?logo=npm)](https://www.npmjs.com/package/soonaverse)
 
-# Soonaverse - Soonaverse JavaScript/Typescript API
+# Soonaverse - Soonaverse JavaScript/Typescript API - APLHA
+
+Please note this is APLHA and we might introduce breaking changes.
 
 Library to interact with Soonaverse platform. 
 
