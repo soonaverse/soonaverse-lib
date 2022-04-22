@@ -37,8 +37,6 @@ export class Soon {
     return collection(this.db(), COL.NFT);
   }
 
-  // participants
-
   private transactionRef(): CollectionReference<DocumentData> {
     return collection(this.db(), COL.TRANSACTION);
   }
@@ -105,7 +103,7 @@ export class Soon {
     const memberUidChunks = ranking.reduce((accumulator, { uid }, currentIndex) => {
       const index = Math.floor(currentIndex / 10);
 
-      accumulator[index] ??= [];
+      accumulator[index] = accumulator[index] || [];
       accumulator[index].push(uid);
 
       return accumulator;
