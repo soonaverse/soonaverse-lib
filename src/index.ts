@@ -7,7 +7,6 @@ import { Collection, Transaction, TransactionType } from './interfaces/models';
 import { COL } from './interfaces/models/base';
 import { Nft } from './interfaces/models/nft';
 import { Member } from './interfaces/models/member';
-import * as _ from 'underscore';
 
 /**
  * Public class to interact with Soonaverse.
@@ -85,26 +84,51 @@ export class Soon {
     const nftSnapshot = await getDocs(nftDoc);
     const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
 
-    var ranking = _.chain(_.countBy(nftList, function(nft){ return nft.owner || ''; })).map(function(count, uid) {
-      return {
-          count: count,
-          uid: uid
+    let ranking = nftList.reduce((accumulator, { owner }) => {
+      const uid = owner || '';
+
+      if (accumulator.find(record => record.uid === owner) === undefined) {
+        accumulator.push({ uid, count: 1, rank: undefined });
       }
-    }).sortBy('count').reverse().value().slice(0, top);
 
-    const members = <string[]>ranking.map(member => member.uid);
+      let record = accumulator.find(record => record.uid === owner);
 
-    let memberList:any[] = new Array();
+      if (record !== undefined) {
+        record.count++;
+      }
 
-    await Promise.all(members.map(async (uid) => {
-      const memberDoc = doc(this.memberRef(), uid);
-      const memberSnapshot = await getDoc(memberDoc);
-      let { name } = <Member>memberSnapshot.data()
-      memberList.push({ uid, name });
+      return accumulator;
+    }, Array<{ count: number; uid: string; rank?: number; }> ());
+
+    ranking = ranking.sort((a, b) => b.count - a.count).slice(0, top);
+
+    const memberUidChunks = ranking.reduce((accumulator, { uid }, currentIndex) => {
+      const index = Math.floor(currentIndex / 10);
+
+      accumulator[index] ??= [];
+      accumulator[index].push(uid);
+
+      return accumulator;
+    }, Array<Array<string>> ());
+    
+    let members:any[] = new Array();
+
+    await Promise.all(memberUidChunks.map(async (uid) => {
+      const memberDoc = query(this.memberRef(), where('uid', 'in', uid));
+      const memberSnapshot = await getDocs(memberDoc);
+      const memberList = <Member[]>memberSnapshot.docs.map(doc => doc.data());
+
+      memberList.forEach(member => {
+        members.push({ uid: member.uid, member: member.name });
+      });
     }));
 
-    memberList.forEach(member => {
+    members.forEach(member => {
       Object.assign(ranking.find((ranking) => ranking.uid === member.uid), member);
+    });
+
+    ranking.forEach((record, index) =>  {
+      record.rank = index + 1;
     });
 
     return ranking;
