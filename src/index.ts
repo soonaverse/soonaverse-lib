@@ -274,6 +274,22 @@ export class Soon {
     return nftList;
   }
 
+  /**
+   * Get all transactions for the given space
+   * 
+   * @returns space
+   */
+  public async getSpaceTransactions(spaceId: string): Promise<Transaction[]> {
+    const tranDoc = query(this.transactionRef(), where("type", "in", [
+      TransactionType.CREDIT,
+      TransactionType.PAYMENT,
+      TransactionType.BILL_PAYMENT
+    ]), where('space', '==', spaceId));
+    const tranSnapshot = await getDocs(tranDoc);
+    const tranList = <Transaction[]>tranSnapshot.docs.map(doc => doc.data());
+    return tranList;
+  }
+
   private db(): Firestore {
     return getFirestore(Soon.app);
   }

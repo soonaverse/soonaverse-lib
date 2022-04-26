@@ -30,7 +30,7 @@ soon.getNftsByIotaAddress('iota1qryv5aqy0p7lcr7djn8fea9cl4rqqv3xxcqah0erc2gdee3c
 ### Use JS script directly in your app
 Add script within your html
 ```
-<script src="https://cdn.jsdelivr.net/npm/soonaverse@latest/dist/soon.js"></script>
+<script src="https://unpkg.com/soonaverse@latest/dist/soon.js"></script>
 
 // We initiate Soon class to window.soon
 ```
@@ -86,6 +86,20 @@ getNftsByEthAddress('0x551FD2C7c7bF356baC194587dAb2fcd46420054b').then((obj) => 
 Get NFT
 ```
 getNft('0xa16722921cf0aa33ccc0d36bdff057dece5dc7ae').then((obj) => {
+  console.log(obj);
+});
+```
+
+### GET: getMemberByIds
+```
+getMemberByIds(['0xa16722921cf0aa33ccc0d36bdff057dece5dc7ae']).then((obj) => {
+  console.log(obj);
+});
+```
+
+### GET: getSpaceTransactions
+```
+getSpaceTransactions(['0x9e983f054e294d41beacbb28f769bcbc044b0766']).then((obj) => {
   console.log(obj);
 });
 ```

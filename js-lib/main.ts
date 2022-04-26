@@ -37,3 +37,8 @@ const soon = new Soon();
 // soon.getNftsByCollections(['0xc9813fa99b4b5a7f0e18e912bf726730bc633c17']).then((obj) => {
 //     console.log(obj);
 // });
+
+// Get space transactions
+// soon.getSpaceTransactions('0x9e983f054e294d41beacbb28f769bcbc044b0766').then((obj) => {
+//     console.log(obj);
+// });
