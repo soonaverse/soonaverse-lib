@@ -142,6 +142,24 @@ export class Soon {
     const collectionSnapshot = await getDoc(collectionDoc);
     return <Collection>collectionSnapshot.data();
   }
+         
+  /**
+   * Get Users for the given list of ethaddresses.
+   * 
+   * @param ethAddresses string[] eth Addresses to search.
+   *
+   * @returns string[]
+   */
+  public async getMemberByIds(ethAddresses: string[]): Promise<Member[]> {
+    if (ethAddresses.length > 10) {
+      throw new Error('Max 10 addresses can be queried at once.');
+    }
+
+    const memberDoc = query(this.memberRef(), where('uid', 'in', ethAddresses));
+    const memberSnapshot = await getDocs(memberDoc);
+    const memberList = <Member[]>memberSnapshot.docs.map(doc => doc.data());
+    return memberList;
+  }
 
   /**
    * Get all NFTs owned by ETH address
