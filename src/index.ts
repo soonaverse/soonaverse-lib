@@ -144,27 +144,22 @@ export class Soon {
   }
          
   /**
-   * Get Discord Usernames for the given list of ethaddresses.
+   * Get Users for the given list of ethaddresses.
    * 
    * @param ethAddresses string[] eth Addresses to search.
    *
    * @returns string[]
    */
-  public async getDiscordbyEthAddr(ethAddresses: string[]): Promise<Member[]> {
-	if (ethAddresses.length > 10) {
-		throw new Error('Max 10 addresses can be queried at once.');
-	}
-	
-	let discordtags:any[] = new Array();
-	const memberDoc = query(this.memberRef(), where('uid', 'in', ethAddresses));
+  public async getMemberByIds(ethAddresses: string[]): Promise<Member[]> {
+    if (ethAddresses.length > 10) {
+      throw new Error('Max 10 addresses can be queried at once.');
+    }
+
+    let discordtags:any[] = new Array();
+    const memberDoc = query(this.memberRef(), where('uid', 'in', ethAddresses));
     const memberSnapshot = await getDocs(memberDoc);
     const memberList = <Member[]>memberSnapshot.docs.map(doc => doc.data());
-
-    memberList.forEach(member => {
-        discordtags.push(member.discord);
-    });
-	
-	return discordtags;
+    return memberList;
   }
 
   /**
