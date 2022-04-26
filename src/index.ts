@@ -155,7 +155,6 @@ export class Soon {
       throw new Error('Max 10 addresses can be queried at once.');
     }
 
-    let discordtags:any[] = new Array();
     const memberDoc = query(this.memberRef(), where('uid', 'in', ethAddresses));
     const memberSnapshot = await getDocs(memberDoc);
     const memberList = <Member[]>memberSnapshot.docs.map(doc => doc.data());
