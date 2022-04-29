@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { Firestore, limit } from 'firebase/firestore'
+import { Firestore, initializeFirestore, limit } from 'firebase/firestore'
 import { getFirestore, collection, getDocs, getDoc, doc, 
          DocumentData, CollectionReference, query, where, onSnapshot } from 'firebase/firestore';
 import { Collection, Transaction, TransactionType } from './interfaces/models';
@@ -15,13 +15,19 @@ export class Soon {
   public static app: FirebaseApp;
   /**
    * We connect to soonaverse as part of the contract. We only create one connection.
+   * 
+   * @params experimentalForceLongPolling Forces the SDK’s underlying network transport (WebChannel) to use long-polling.
    */
-  constructor() {
+  constructor(experimentalForceLongPolling: boolean = false) {
     if (!Soon.app) {
       Soon.app = initializeApp({
         apiKey: "AIzaSyB4fcG8rtNWAiAtSmxmK3q3JLfMvtNCGP4",
         projectId: "soonaverse"
       });
+
+      if (experimentalForceLongPolling) {
+        initializeFirestore(Soon.app, {experimentalForceLongPolling: true})
+      }
     }
   }
 
