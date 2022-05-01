@@ -27,6 +27,15 @@ soon.getNftsByIotaAddress('iota1qryv5aqy0p7lcr7djn8fea9cl4rqqv3xxcqah0erc2gdee3c
 });
 ```
 
+By default WebSocket is used. If you prefer to use REST initialise Soon class with "false":
+
+```
+const soon = new Soon(true);
+```
+
+Note: Real-time functions are not supported in REST mode.
+
+
 ### Use JS script directly in your app
 Add script within your html
 ```

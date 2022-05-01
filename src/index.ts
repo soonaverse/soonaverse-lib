@@ -1,8 +1,13 @@
 import { Observable } from 'rxjs';
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { Firestore, initializeFirestore, limit } from 'firebase/firestore'
 import { getFirestore, collection, getDocs, getDoc, doc, 
-         DocumentData, CollectionReference, query, where, onSnapshot } from 'firebase/firestore';
+         DocumentData, CollectionReference, query, where, onSnapshot, 
+         Firestore, limit } from 'firebase/firestore';
+
+import { getFirestore as getFirestoreLite, collection as collectionLite, getDocs as getDocsLite, getDoc as getDocLite, doc as docLite, 
+         query as queryLite, where as whereLite,
+         limit as limitLite} from 'firebase/firestore/lite';
+
 import { Collection, Transaction, TransactionType } from './interfaces/models';
 import { COL } from './interfaces/models/base';
 import { Nft } from './interfaces/models/nft';
@@ -13,38 +18,63 @@ import { Member } from './interfaces/models/member';
  */
 export class Soon {
   public static app: FirebaseApp;
+  public static restMode: boolean = false;
+
+  // Firebase functions changed on the mode.
+  private _getFirestore = getFirestore;
+  private _collection = collection;
+  private _getDocs: any = getDocs;
+  private _getDoc: any = getDoc;
+  private _doc = doc;
+  private _query = query;
+  private _where = where;
+  private _onSnapshot: any = onSnapshot;
+  private _limit = limit;
+
   /**
    * We connect to soonaverse as part of the contract. We only create one connection.
-   * 
-   * @params experimentalForceLongPolling Forces the SDK’s underlying network transport (WebChannel) to use long-polling.
    */
-  constructor(experimentalForceLongPolling: boolean = false) {
+  constructor(enableRest: boolean = false) {
+    if (enableRest === false && Soon.restMode === true) {
+      console.error('You have to refresh your browser to change into the rest mode.')
+    } else if (enableRest) {
+      Soon.restMode = true;
+    }
+
+    if (Soon.restMode) {
+      this._getFirestore = getFirestoreLite;
+      this._collection = collectionLite;
+      this._getDocs = getDocsLite;
+      this._getDoc = getDocLite;
+      this._doc = docLite;
+      this._query = queryLite;
+      this._where = whereLite;
+      this._onSnapshot = undefined;
+      this._limit = limitLite;
+    }
+
     if (!Soon.app) {
       Soon.app = initializeApp({
         apiKey: "AIzaSyB4fcG8rtNWAiAtSmxmK3q3JLfMvtNCGP4",
         projectId: "soonaverse"
       });
-
-      if (experimentalForceLongPolling) {
-        initializeFirestore(Soon.app, {experimentalForceLongPolling: true})
-      }
     }
   }
 
   private collectionRef(): CollectionReference<DocumentData> {
-    return collection(this.db(), COL.COLLECTION);
+    return this._collection(this.db(), COL.COLLECTION);
   }
 
   private memberRef(): CollectionReference<DocumentData> {
-    return collection(this.db(), COL.MEMBER);
+    return this._collection(this.db(), COL.MEMBER);
   }
 
   private nftRef(): CollectionReference<DocumentData> {
-    return collection(this.db(), COL.NFT);
+    return this._collection(this.db(), COL.NFT);
   }
 
   private transactionRef(): CollectionReference<DocumentData> {
-    return collection(this.db(), COL.TRANSACTION);
+    return this._collection(this.db(), COL.TRANSACTION);
   }
 
   /**
@@ -53,8 +83,8 @@ export class Soon {
    * @returns Nft
    */
   public async getNft(nftId: string): Promise<Nft> {
-    const nftDoc = doc(this.nftRef(), nftId.toLowerCase());
-    const nftSnapshot = await getDoc(nftDoc);
+    const nftDoc = this._doc(this.nftRef(), nftId.toLowerCase());
+    const nftSnapshot = await this._getDoc(nftDoc);
     return <Nft>nftSnapshot.data();
   }
 
@@ -68,9 +98,11 @@ export class Soon {
       throw new Error('Max 10 collections can be queried at once.');
     }
 
-    const nftDoc = query(this.nftRef(), where("hidden", "==", false), where('collection', 'in', collectionIds));
-    const nftSnapshot = await getDocs(nftDoc);
-    const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
+    const nftDoc = this._query(this.nftRef(), this._where("hidden", "==", false), this._where('collection', 'in', collectionIds));
+    const nftSnapshot = await this._getDocs(nftDoc);
+    const nftList = <Nft[]>nftSnapshot.docs.map((doc: any) => {
+      return doc.data();
+    });
     return nftList;
   }
 
@@ -84,9 +116,11 @@ export class Soon {
       throw new Error('Max 10 collections can be queried at once.');
     }
 
-    const nftDoc = query(this.nftRef(), where("hidden", "==", false), where('collection', 'in', collectionIds));
-    const nftSnapshot = await getDocs(nftDoc);
-    const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
+    const nftDoc = this._query(this.nftRef(), this._where("hidden", "==", false), this._where('collection', 'in', collectionIds));
+    const nftSnapshot = await this._getDocs(nftDoc);
+    const nftList = <Nft[]>nftSnapshot.docs.map((doc: any) => {
+      return doc.data();
+    });
 
     let ranking = nftList.reduce((accumulator, { owner }) => {
       const uid = owner || '';
@@ -118,9 +152,11 @@ export class Soon {
     let members:any[] = new Array();
 
     await Promise.all(memberUidChunks.map(async (uid) => {
-      const memberDoc = query(this.memberRef(), where('uid', 'in', uid));
-      const memberSnapshot = await getDocs(memberDoc);
-      const memberList = <Member[]>memberSnapshot.docs.map(doc => doc.data());
+      const memberDoc = this._query(this.memberRef(), this._where('uid', 'in', uid));
+      const memberSnapshot = await this._getDocs(memberDoc);
+      const memberList = <Member[]>memberSnapshot.docs.map((doc: any) => {
+        return doc.data();
+      });
 
       memberList.forEach(member => {
         members.push({ uid: member.uid, member: member.name });
@@ -144,8 +180,8 @@ export class Soon {
    * @returns Collection
    */
   public async getCollection(collection: string): Promise<Collection> {
-    const collectionDoc = doc(this.collectionRef(), collection.toLowerCase());
-    const collectionSnapshot = await getDoc(collectionDoc);
+    const collectionDoc = this._doc(this.collectionRef(), collection.toLowerCase());
+    const collectionSnapshot = await this._getDoc(collectionDoc);
     return <Collection>collectionSnapshot.data();
   }
          
@@ -161,9 +197,11 @@ export class Soon {
       throw new Error('Max 10 addresses can be queried at once.');
     }
 
-    const memberDoc = query(this.memberRef(), where('uid', 'in', ethAddresses));
-    const memberSnapshot = await getDocs(memberDoc);
-    const memberList = <Member[]>memberSnapshot.docs.map(doc => doc.data());
+    const memberDoc = this._query(this.memberRef(), this._where('uid', 'in', ethAddresses));
+    const memberSnapshot = await this._getDocs(memberDoc);
+    const memberList = <Member[]>memberSnapshot.docs.map((doc: any) => {
+      return doc.data();
+    });
     return memberList;
   }
 
@@ -173,9 +211,11 @@ export class Soon {
    * @returns Nft[] Array of all nfts.
    */
   public async getNftsByEthAddress(ethAddress: string): Promise<Nft[]> {
-    const q = query(this.nftRef(), where('hidden', '==', false), where('owner', '==', ethAddress.toLowerCase()));
-    const nftSnapshot = await getDocs(q);
-    const nftList = <Nft[]>nftSnapshot.docs.map(doc => doc.data());
+    const q = this._query(this.nftRef(), this._where('hidden', '==', false), this._where('owner', '==', ethAddress.toLowerCase()));
+    const nftSnapshot = await this._getDocs(q);
+    const nftList = <Nft[]>nftSnapshot.docs.map((doc: any) => {
+      return doc.data();
+    });
     return nftList;
   }
 
@@ -185,8 +225,12 @@ export class Soon {
    * @return Nft Latest NFT record.
    */
   public onNft(nftId: string): Observable<Nft|undefined> {
+    if (!this._onSnapshot) {
+      throw new Error('Real-time is not supported in restlet mode.')
+    }
+
     return new Observable((observe) => {
-      const unsub = onSnapshot(doc(this.nftRef(), nftId.toLowerCase()), { includeMetadataChanges: true }, (o) => {
+      const unsub = this._onSnapshot(this._doc(this.nftRef(), nftId.toLowerCase()), { includeMetadataChanges: true }, (o: any) => {
         observe.next(<Nft|undefined>o.data());
       });
 
@@ -203,8 +247,12 @@ export class Soon {
    * @return Collection Latest Collection record.
    */
   public onCollection(collectionId: string): Observable<Collection|undefined> {
+    if (!this._onSnapshot) {
+      throw new Error('Realtime is not supported in restlet mode.')
+    }
+
     return new Observable((observe) => {
-      const unsub = onSnapshot(doc(this.nftRef(), collectionId.toLowerCase()), { includeMetadataChanges: true }, (o) => {
+      const unsub = this._onSnapshot(this._doc(this.nftRef(), collectionId.toLowerCase()), { includeMetadataChanges: true }, (o: any) => {
         observe.next(<Collection|undefined>o.data());
       });
 
@@ -221,16 +269,22 @@ export class Soon {
    * @return Nft Latest NFT record.
    */
   public onValidPayment(): Observable<Transaction[]> {
+    if (!this._onSnapshot) {
+      throw new Error('Realtime is not supported in restlet mode.')
+    }
+
     return new Observable((observe) => {
-      const q = query(
+      const q = this._query(
         this.transactionRef(),
-        where('type', '==', TransactionType.PAYMENT),
-        where('payload.invalidPayment', '==', false),
-        limit(1)
+        this._where('type', '==', TransactionType.PAYMENT),
+        this._where('payload.invalidPayment', '==', false),
+        this._limit(1)
       );
 
-      const unsub = onSnapshot(q, { includeMetadataChanges: true }, (nftSnapshot) => {
-        observe.next(<Transaction[]>nftSnapshot.docs.map(doc => doc.data()));
+      const unsub = this._onSnapshot(q, { includeMetadataChanges: true }, (nftSnapshot: any) => {
+        observe.next(<Transaction[]>nftSnapshot.docs.map((doc: any) => {
+          return doc.data();
+        }));
       });
 
       // Provide a way of canceling and disposing the interval resource
@@ -259,17 +313,17 @@ export class Soon {
     });
 
     const nftList: Nft[] = [];
-    const q = query(
+    const q = this._query(
       this.transactionRef(), 
-      where('payload.sourceAddress', 'in', iotaAddresses),
-      where('type', '==', TransactionType.PAYMENT),
-      where('payload.invalidPayment', '==', false)
+      this._where('payload.sourceAddress', 'in', iotaAddresses),
+      this._where('type', '==', TransactionType.PAYMENT),
+      this._where('payload.invalidPayment', '==', false)
     );
-    const paymentSnapshot = await getDocs(q);
+    const paymentSnapshot = await this._getDocs(q);
     for (const pay of paymentSnapshot.docs) {
         if (pay.data().payload.nft && pay.data().member) {
-        const nftDoc = doc(this.nftRef(), pay.data().payload.nft);
-        const nftSnapshot = await getDoc(nftDoc);
+        const nftDoc = this._doc(this.nftRef(), pay.data().payload.nft);
+        const nftSnapshot = await this._getDoc(nftDoc);
         // Still owner.
         if (nftSnapshot.data()?.owner === pay.data().member) {
           nftList.push(<Nft>nftSnapshot.data());
@@ -286,17 +340,20 @@ export class Soon {
    * @returns space
    */
   public async getSpaceTransactions(spaceId: string): Promise<Transaction[]> {
-    const tranDoc = query(this.transactionRef(), where("type", "in", [
+    const tranDoc = this._query(this.transactionRef(), this._where("type", "in", [
       TransactionType.CREDIT,
       TransactionType.PAYMENT,
       TransactionType.BILL_PAYMENT
-    ]), where('space', '==', spaceId));
-    const tranSnapshot = await getDocs(tranDoc);
-    const tranList = <Transaction[]>tranSnapshot.docs.map(doc => doc.data());
+    ]), this._where('space', '==', spaceId));
+    const tranSnapshot = await this._getDocs(tranDoc);
+    const tranList = <Transaction[]>tranSnapshot.docs.map((doc: any) => {
+      return doc.data();
+    });
+
     return tranList;
   }
 
   private db(): Firestore {
-    return getFirestore(Soon.app);
+    return this._getFirestore(Soon.app);
   }
 }
