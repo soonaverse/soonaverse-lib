@@ -20,6 +20,7 @@ export class SoonTransactionRepository extends CrudRepository<Transaction> {
         this.colRef(),
         this._where("type", "==", TransactionType.PAYMENT),
         this._where("payload.invalidPayment", "==", false),
+        this._orderBy("createdOn", "desc"),
         this._limit(1)
       );
 
@@ -35,10 +36,12 @@ export class SoonTransactionRepository extends CrudRepository<Transaction> {
   /**
    * Get all transactions for the given space
    *
-   * @param spaceId - Space id
+   * @param space - Space id
    * @returns - List of transactions for the given space id
    */
-  public async getBySpaceId(spaceId: string): Promise<Transaction[]> {
+  public async getPaymentTransactionsBySpace(
+    space: string
+  ): Promise<Transaction[]> {
     const types = [
       TransactionType.CREDIT,
       TransactionType.PAYMENT,
@@ -47,7 +50,7 @@ export class SoonTransactionRepository extends CrudRepository<Transaction> {
     const query = this._query(
       this.colRef(),
       this._where("type", "in", types),
-      this._where("space", "==", spaceId)
+      this._where("space", "==", space)
     );
     const snapshot = await this._getDocs(query);
     return snapshot.docs.map((d) => <Transaction>d.data());

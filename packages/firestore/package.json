@@ -12,8 +12,8 @@
     "lib"
   ],
   "scripts": {
-    "build": "tsc",
-    "prepare": "tsc",
+    "build": "tsc --build tsconfig.prod.json",
+    "prepare": "tsc --build tsconfig.prod.json",
     "test": "jest --forceExit",
     "serve": "firebase -c ./test/firebase.json emulators:start --only firestore,ui"
   },

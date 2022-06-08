@@ -1,15 +1,14 @@
-import { COL } from "@soonaverse/model";
+import { Base, COL } from "@soonaverse/model";
 import {
   collection,
   doc,
-  DocumentData,
   Firestore,
   getDoc,
   getDocs,
   limit,
   onSnapshot,
+  orderBy,
   query,
-  QueryDocumentSnapshot,
   startAfter,
   where,
 } from "firebase/firestore";
@@ -19,12 +18,13 @@ import {
   getDoc as getDocLite,
   getDocs as getDocsLite,
   limit as limitLite,
+  orderBy as orderByLite,
   query as queryLite,
   startAfter as startAfterLite,
   where as whereLite,
 } from "firebase/firestore/lite";
 import { Observable } from "rxjs";
-import Config from "../Config";
+import Soonaverse from "../Soonaverse";
 
 export class CrudRepository<T> {
   protected db: Firestore;
@@ -38,10 +38,10 @@ export class CrudRepository<T> {
   protected _onSnapshot = onSnapshot;
   protected _limit = limit;
   protected _startAfter = startAfter;
+  protected _orderBy = orderBy;
 
   constructor(protected readonly col: COL) {
-    Config.connect();
-    if (Config.isLiteMode()) {
+    if (Soonaverse.isLiteMode()) {
       this._collection = collectionLite;
       this._getDocs = getDocsLite as any;
       this._getDoc = getDocLite as any;
@@ -51,16 +51,21 @@ export class CrudRepository<T> {
       this._onSnapshot = undefined as any;
       this._limit = limitLite;
       this._startAfter = startAfterLite;
+      this._orderBy = orderByLite;
     }
-    this.db = Config.getFirestoreConnection();
+    const connection = Soonaverse.getFirestoreConnection();
+    if (!connection) {
+      throw new Error('Soonaverse is not connected. Please call Soonaverse.connect.')
+    }
+    this.db = connection
   }
 
   protected colRef = () => this._collection(this.db, this.col);
 
   /**
-   * Gets a document for the given id
-   * @param id - Firebase document id
-   * @returns - If the document exists then document data else undefined
+   * Gets document for the given id
+   * @param id - Id of the document
+   * @returns - Document or undefined if nothing exists for the given id.
    */
   public getById = async (id: string): Promise<T | undefined> => {
     const docRef = this._doc(this.db, `${this.col}/${id}`);
@@ -87,7 +92,7 @@ export class CrudRepository<T> {
     this.assertNotLite();
     return new Observable((observe) =>
       this._onSnapshot(
-        this._doc(this.colRef(), id.toLowerCase()),
+        this._doc(this.colRef(), id),
         { includeMetadataChanges: true },
         (doc) => observe.next(<T | undefined>doc.data())
       )
@@ -115,23 +120,30 @@ export class CrudRepository<T> {
    * @param limit - Limit the number of documents return, default is 50, max is 100
    * @returns
    */
-  public getAll = async (
-    startAfter: QueryDocumentSnapshot<DocumentData> | undefined,
-    limit = 50
-  ) => {
+  public getAll = async <D extends Base>(startAfter?: D, limit = 50) => {
     if (limit > 100) {
       throw new Error(`Max 100 documents can be queried at once.`);
     }
-    const query = this._query(
+    let query = this._query(
       this.colRef(),
       this._limit(limit),
-      this._startAfter(startAfter)
+      this._orderBy("createdOn")
     );
+    if (startAfter) {
+      const doc = this._doc(this.db, `${this.col}/${startAfter.uid}`);
+      query = this._query(query, this._startAfter(await this._getDoc(doc)));
+    }
     const snap = await this._getDocs(query);
     return snap.docs.map((d) => <T>d.data());
   };
 
-  protected getByField = async (fieldName: string, fieldValue: any) => {
+  /**
+   * Returns all documents where the given field name equals the given value
+   * @param fieldName - A valid field name
+   * @param fieldValue - Any value for the given field
+   * @returns 
+   */
+  public getByField = async (fieldName: string, fieldValue: any) => {
     const query = this._query(
       this.colRef(),
       this._where(fieldName, "==", fieldValue)
@@ -141,7 +153,7 @@ export class CrudRepository<T> {
   };
 
   protected assertNotLite = () => {
-    if (Config.isLiteMode()) {
+    if (Soonaverse.isLiteMode()) {
       throw new Error("Realtime is not supported in lite mode.");
     }
   };

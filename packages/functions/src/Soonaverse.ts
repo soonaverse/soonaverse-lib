@@ -2,8 +2,7 @@ import { API_KEY, PROJECT_ID } from "@soonaverse/credentials";
 import { initializeApp } from "firebase/app";
 import { Functions, getFunctions } from "firebase/functions";
 
-
-class Config {
+class Soonaverse {
   private functions: Functions | undefined;
 
   public connect = (apiKey = API_KEY, projectId = PROJECT_ID) => {
@@ -17,4 +16,4 @@ class Config {
   public getFunctionsConnection = () => this.functions!;
 }
 
-export default new Config();
+export default new Soonaverse();

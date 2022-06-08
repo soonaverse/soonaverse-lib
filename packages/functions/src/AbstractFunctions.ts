@@ -1,6 +1,6 @@
 import { WenRequest } from "@soonaverse/model";
 import { Functions, httpsCallable } from "firebase/functions";
-import Config from "./Config";
+import Soonaverse from "./Soonaverse";
 
 export const enum WEN_FUNC {
   // Member functions.
@@ -76,7 +76,12 @@ export abstract class AbstractFunctions<Res> {
   protected functions: Functions;
 
   constructor() {
-    this.functions = Config.getFunctionsConnection();
+    if (!Soonaverse.getFunctionsConnection()) {
+      throw new Error(
+        "Soonaverse is not connected. Please call Soonaverse.connect."
+      );
+    }
+    this.functions = Soonaverse.getFunctionsConnection();
   }
 
   protected request = (func: WEN_FUNC) => async (req: WenRequest) => {

@@ -33,7 +33,7 @@ export class SoonNftRepository extends CrudRepository<Nft> {
    * @param ethAddress
    * @returns
    */
-  public async getByEthAddress(ethAddress: string): Promise<Nft[]> {
+  public async getByOwner(ethAddress: string): Promise<Nft[]> {
     const query = this._query(
       this.colRef(),
       this._where("hidden", "==", false),
@@ -49,10 +49,8 @@ export class SoonNftRepository extends CrudRepository<Nft> {
    * @param iotaAddresses - Iota Addresses to search. Max 10 addresses.
    * @returns - Array of all nfts.
    */
-  public async getNftsByIotaAddress(iotaAddresses: string[]): Promise<Nft[]> {
-    if (iotaAddresses.length > 10) {
-      throw new Error("Max 10 addresses can be queried at once.");
-    }
+  public async getByIotaAddress(iotaAddresses: string[]): Promise<Nft[]> {
+    this.assertMaxLength(iotaAddresses);
     const lowerCaseAddresses = iotaAddresses.map((i) => i.toLowerCase());
     const query = this._query(
       this._collection(this.db, COL.TRANSACTION),
