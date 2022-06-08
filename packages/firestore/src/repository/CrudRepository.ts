@@ -1,5 +1,4 @@
-import { COL } from '@soonaverse/model';
-import { FirebaseApp } from 'firebase/app';
+import { COL } from "@soonaverse/model";
 import {
   collection,
   doc,
@@ -7,31 +6,29 @@ import {
   Firestore,
   getDoc,
   getDocs,
-  getFirestore,
   limit,
   onSnapshot,
   query,
   QueryDocumentSnapshot,
   startAfter,
   where,
-} from 'firebase/firestore';
+} from "firebase/firestore";
 import {
   collection as collectionLite,
   doc as docLite,
   getDoc as getDocLite,
   getDocs as getDocsLite,
-  getFirestore as getFirestoreLite,
   limit as limitLite,
   query as queryLite,
   startAfter as startAfterLite,
   where as whereLite,
-} from 'firebase/firestore/lite';
-import { Observable } from 'rxjs';
+} from "firebase/firestore/lite";
+import { Observable } from "rxjs";
+import Config from "../Config";
 
-export abstract class CrudRepository<T> {
+export class CrudRepository<T> {
   protected db: Firestore;
 
-  protected _getFirestore = getFirestore;
   protected _collection = collection;
   protected _getDocs = getDocs;
   protected _getDoc = getDoc;
@@ -42,13 +39,9 @@ export abstract class CrudRepository<T> {
   protected _limit = limit;
   protected _startAfter = startAfter;
 
-  constructor(
-    protected readonly app: FirebaseApp,
-    protected readonly col: COL,
-    protected readonly lite = false
-  ) {
-    if (this.lite) {
-      this._getFirestore = getFirestoreLite;
+  constructor(protected readonly col: COL) {
+    Config.connect();
+    if (Config.isLiteMode()) {
       this._collection = collectionLite;
       this._getDocs = getDocsLite as any;
       this._getDoc = getDocLite as any;
@@ -59,7 +52,7 @@ export abstract class CrudRepository<T> {
       this._limit = limitLite;
       this._startAfter = startAfterLite;
     }
-    this.db = this._getFirestore(this.app);
+    this.db = Config.getFirestoreConnection();
   }
 
   protected colRef = () => this._collection(this.db, this.col);
@@ -82,7 +75,7 @@ export abstract class CrudRepository<T> {
   public getManyById = async (ids: string[]): Promise<T[]> => {
     const promises = ids.map(this.getById);
     const result = await Promise.all(promises);
-    return <T[]>result.filter(d => d !== undefined);
+    return <T[]>result.filter((d) => d !== undefined);
   };
 
   /**
@@ -92,11 +85,11 @@ export abstract class CrudRepository<T> {
    */
   public onChange = (id: string): Observable<T | undefined> => {
     this.assertNotLite();
-    return new Observable(observe =>
+    return new Observable((observe) =>
       this._onSnapshot(
         this._doc(this.colRef(), id.toLowerCase()),
         { includeMetadataChanges: true },
-        doc => observe.next(<T | undefined>doc.data())
+        (doc) => observe.next(<T | undefined>doc.data())
       )
     );
   };
@@ -106,7 +99,7 @@ export abstract class CrudRepository<T> {
    * @param space - The id of the space
    * @returns
    */
-  public getBySpace = async (space: string) => this.getByField('space', space);
+  public getBySpace = async (space: string) => this.getByField("space", space);
 
   /**
    * Gets all the documents for the given member
@@ -114,7 +107,7 @@ export abstract class CrudRepository<T> {
    * @returns
    */
   public getByMember = async (member: string) =>
-    this.getByField('member', member);
+    this.getByField("member", member);
 
   /**
    * Gets all the documents from the collection
@@ -135,21 +128,21 @@ export abstract class CrudRepository<T> {
       this._startAfter(startAfter)
     );
     const snap = await this._getDocs(query);
-    return snap.docs.map(d => <T>d.data());
+    return snap.docs.map((d) => <T>d.data());
   };
 
   protected getByField = async (fieldName: string, fieldValue: any) => {
     const query = this._query(
       this.colRef(),
-      this._where(fieldName, '==', fieldValue)
+      this._where(fieldName, "==", fieldValue)
     );
     const snapshot = await this._getDocs(query);
-    return snapshot.docs.map(d => <T>d.data());
+    return snapshot.docs.map((d) => <T>d.data());
   };
 
   protected assertNotLite = () => {
-    if (this.lite) {
-      throw new Error('Realtime is not supported in lite mode.');
+    if (Config.isLiteMode()) {
+      throw new Error("Realtime is not supported in lite mode.");
     }
   };
 

@@ -1,11 +1,10 @@
-import { COL, Transaction, TransactionType } from '@soonaverse/model';
-import { FirebaseApp } from 'firebase/app';
-import { Observable } from 'rxjs';
-import { CrudRepository } from './CrudRepository';
+import { COL, Transaction, TransactionType } from "@soonaverse/model";
+import { Observable } from "rxjs";
+import { CrudRepository } from "./CrudRepository";
 
 export class SoonTransactionRepository extends CrudRepository<Transaction> {
-  constructor(app: FirebaseApp, lite = false) {
-    super(app, COL.TRANSACTION, lite);
+  constructor() {
+    super(COL.TRANSACTION);
   }
 
   /**
@@ -16,18 +15,19 @@ export class SoonTransactionRepository extends CrudRepository<Transaction> {
   public onValidPayment(): Observable<Transaction[]> {
     this.assertNotLite();
 
-    return new Observable(observe => {
+    return new Observable((observe) => {
       const query = this._query(
         this.colRef(),
-        this._where('type', '==', TransactionType.PAYMENT),
-        this._where('payload.invalidPayment', '==', false),
+        this._where("type", "==", TransactionType.PAYMENT),
+        this._where("payload.invalidPayment", "==", false),
         this._limit(1)
       );
 
       return this._onSnapshot(
         query,
         { includeMetadataChanges: true },
-        snapshot => observe.next(snapshot.docs.map(d => <Transaction>d.data()))
+        (snapshot) =>
+          observe.next(snapshot.docs.map((d) => <Transaction>d.data()))
       );
     });
   }
@@ -46,10 +46,10 @@ export class SoonTransactionRepository extends CrudRepository<Transaction> {
     ];
     const query = this._query(
       this.colRef(),
-      this._where('type', 'in', types),
-      this._where('space', '==', spaceId)
+      this._where("type", "in", types),
+      this._where("space", "==", spaceId)
     );
     const snapshot = await this._getDocs(query);
-    return snapshot.docs.map(d => <Transaction>d.data());
+    return snapshot.docs.map((d) => <Transaction>d.data());
   }
 }

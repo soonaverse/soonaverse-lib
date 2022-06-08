@@ -1,6 +1,5 @@
-import { COL, Nft, Transaction, TransactionType } from '@soonaverse/model';
-import { FirebaseApp } from 'firebase/app';
-import { CrudRepository } from './CrudRepository';
+import { COL, Nft, Transaction, TransactionType } from "@soonaverse/model";
+import { CrudRepository } from "./CrudRepository";
 
 export interface Record {
   count: number;
@@ -9,8 +8,8 @@ export interface Record {
 }
 
 export class SoonNftRepository extends CrudRepository<Nft> {
-  constructor(app: FirebaseApp, lite = false) {
-    super(app, COL.NFT, lite);
+  constructor() {
+    super(COL.NFT);
   }
 
   /**
@@ -22,11 +21,11 @@ export class SoonNftRepository extends CrudRepository<Nft> {
     this.assertMaxLength(collectionIds);
     const query = this._query(
       this.colRef(),
-      this._where('hidden', '==', false),
-      this._where('collection', 'in', collectionIds)
+      this._where("hidden", "==", false),
+      this._where("collection", "in", collectionIds)
     );
     const snapshot = await this._getDocs(query);
-    return snapshot.docs.map(d => <Nft>d.data());
+    return snapshot.docs.map((d) => <Nft>d.data());
   }
 
   /**
@@ -37,11 +36,11 @@ export class SoonNftRepository extends CrudRepository<Nft> {
   public async getByEthAddress(ethAddress: string): Promise<Nft[]> {
     const query = this._query(
       this.colRef(),
-      this._where('hidden', '==', false),
-      this._where('owner', '==', ethAddress.toLowerCase())
+      this._where("hidden", "==", false),
+      this._where("owner", "==", ethAddress.toLowerCase())
     );
     const snapshot = await this._getDocs(query);
-    return snapshot.docs.map(d => <Nft>d.data());
+    return snapshot.docs.map((d) => <Nft>d.data());
   }
 
   /**
@@ -52,17 +51,17 @@ export class SoonNftRepository extends CrudRepository<Nft> {
    */
   public async getNftsByIotaAddress(iotaAddresses: string[]): Promise<Nft[]> {
     if (iotaAddresses.length > 10) {
-      throw new Error('Max 10 addresses can be queried at once.');
+      throw new Error("Max 10 addresses can be queried at once.");
     }
-    const lowerCaseAddresses = iotaAddresses.map(i => i.toLowerCase());
+    const lowerCaseAddresses = iotaAddresses.map((i) => i.toLowerCase());
     const query = this._query(
       this._collection(this.db, COL.TRANSACTION),
-      this._where('payload.sourceAddress', 'in', lowerCaseAddresses),
-      this._where('type', '==', TransactionType.PAYMENT),
-      this._where('payload.invalidPayment', '==', false)
+      this._where("payload.sourceAddress", "in", lowerCaseAddresses),
+      this._where("type", "==", TransactionType.PAYMENT),
+      this._where("payload.invalidPayment", "==", false)
     );
     const snapshot = await this._getDocs(query);
-    const promises = snapshot.docs.map(async doc => {
+    const promises = snapshot.docs.map(async (doc) => {
       const payment = <Transaction>doc.data();
       if (payment.payload.nft && payment.member) {
         const docRef = this._doc(this.colRef(), payment.payload.nft);
@@ -74,6 +73,6 @@ export class SoonNftRepository extends CrudRepository<Nft> {
       return undefined;
     });
     const result = await Promise.all(promises);
-    return <Nft[]>result.filter(nft => nft !== undefined);
+    return <Nft[]>result.filter((nft) => nft !== undefined);
   }
 }

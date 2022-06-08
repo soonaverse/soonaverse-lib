@@ -1,9 +1,8 @@
-import { COL, Notification } from '@soonaverse/model';
-import { FirebaseApp } from 'firebase/app';
-import { CrudRepository } from './CrudRepository';
+import { COL, Notification } from "@soonaverse/model";
+import { CrudRepository } from "./CrudRepository";
 
 export class SoonNotificationRepository extends CrudRepository<Notification> {
-  constructor(app: FirebaseApp, lite = false) {
-    super(app, COL.NOTIFICATION, lite);
+  constructor() {
+    super(COL.NOTIFICATION);
   }
 }

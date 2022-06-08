@@ -1,0 +1,87 @@
+import { WenRequest } from "@soonaverse/model";
+import { Functions, httpsCallable } from "firebase/functions";
+import Config from "./Config";
+
+export const enum WEN_FUNC {
+  // Member functions.
+  cMemberNotExists = "cMemberNotExists",
+  uMember = "uMember",
+
+  // Space functions.
+  cSpace = "cSpace",
+  uSpace = "uSpace",
+  joinSpace = "joinSpace",
+  leaveSpace = "leaveSpace",
+  blockMemberSpace = "blockMemberSpace",
+  unblockMemberSpace = "unblockMemberSpace",
+  acceptMemberSpace = "acceptMemberSpace",
+  declineMemberSpace = "declineMemberSpace",
+  addGuardianSpace = "addGuardianSpace",
+  removeGuardianSpace = "removeGuardianSpace",
+  setAlliance = "setAlliance",
+
+  // Award functions
+  cAward = "cAward",
+  aAward = "aAward",
+  rAward = "rAward",
+  addOwnerAward = "addOwnerAward",
+  participateAward = "participateAward",
+  aParticipantAward = "aParticipantAward", // Approve.
+
+  //Proposal
+  cProposal = "cProposal",
+  aProposal = "aProposal", // Approve
+  rProposal = "rProposal", // Reject
+  voteOnProposal = "voteOnProposal",
+
+  // Collection functions.
+  cCollection = "cCollection",
+  uCollection = "uCollection",
+  approveCollection = "approveCollection",
+  rejectCollection = "rejectCollection",
+  collectionWrite = "collectionWrite",
+
+  // NFT functions.
+  cNft = "cNft",
+  cBatchNft = "cBatchNft",
+  setForSaleNft = "setForSaleNft",
+
+  // ORDER functions.
+  orderNft = "orderNft",
+  openBid = "openBid",
+  validateAddress = "validateAddress",
+
+  // TOKEN functions
+  cToken = "cToken",
+  uToken = "uToken",
+  setTokenAvailableForSale = "setTokenAvailableForSale",
+  cancelPublicSale = "cancelPublicSale",
+  orderToken = "orderToken",
+  creditToken = "creditToken",
+  airdropToken = "airdropToken",
+  claimAirdroppedToken = "claimAirdroppedToken",
+  sellToken = "sellToken",
+  buyToken = "buyToken",
+  cancelBuyOrSell = "cancelBuyOrSell",
+  onTokenStatusUpdate = "onTokenStatusUpdate",
+  onTokenBuySellCreated = "onTokenBuySellCreated",
+  onTokenPurchaseCreated = "onTokenPurchaseCreated",
+
+  milestoneTransactionWrite = "milestoneTransactionWrite",
+  nftWrite = "nftWrite",
+  transactionWrite = "transactionWrite",
+}
+
+export abstract class AbstractFunctions<Res> {
+  protected functions: Functions;
+
+  constructor() {
+    this.functions = Config.getFunctionsConnection();
+  }
+
+  protected request = (func: WEN_FUNC) => async (req: WenRequest) => {
+    const callable = httpsCallable<WenRequest, Res>(this.functions, func);
+    const response = await callable(req);
+    return response.data;
+  };
+}

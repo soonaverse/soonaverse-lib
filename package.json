@@ -1,18 +1,9 @@
 {
-  "name": "@soonaverse/root",
-  "description": "Monorepo to interact with Soonaverse platform.",
-  "homepage": "http://www.soonaverse.com",
-  "license": "Apache-2.0",
-  "author": "Boldizsar Mezei",
+  "name": "root",
+  "private": true,
   "devDependencies": {
-    "lerna": "^5.0.0"
-  },
-  "scripts": {
-    "build": "lerna run --scope @soonaverse/* --scope soonaverse build"
-  },
-  "workspaces": {
-    "packages": [
-      "packages/**"
-    ]
+    "@types/node": "^17.0.41",
+    "lerna": "^5.0.0",
+    "typescript": "^4.7.3"
   }
 }
