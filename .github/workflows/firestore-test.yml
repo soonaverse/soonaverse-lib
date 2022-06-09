@@ -15,4 +15,4 @@ jobs:
           node-version: '14'
       - run: npm i
       - run: lerna bootstrap
-      - run: lerna run test --scope=@soonaverse/firestore
+      - run: lerna run test --scope=@soonaverse/lib

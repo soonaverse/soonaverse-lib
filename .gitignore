@@ -1,6 +1,6 @@
 node_modules
-lib
+dist
 npm-debug.log
-packages/*/lib
+packages/*/dist
 .idea
 **/*.log
