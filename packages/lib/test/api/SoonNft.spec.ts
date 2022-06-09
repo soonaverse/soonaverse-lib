@@ -1,6 +1,6 @@
 import { COL, TransactionType } from "@soonaverse/model";
 import { SoonNft } from "../../src";
-import admin, { connect } from "../setup";
+import admin, { connectSoon } from "../setup";
 import { expectThrow, uuid } from "../utils/common.utils";
 
 const dummyNfts = () => [
@@ -43,7 +43,7 @@ describe("Nft test", () => {
   const payment = dummyPayment(nfts[0]);
 
   beforeAll(async () => {
-    connect();
+    connectSoon();
     repo = new SoonNft();
     const promises = nfts.map((nft) =>
       admin.firestore().doc(`${COL.NFT}/${nft.uid}`).create(nft)

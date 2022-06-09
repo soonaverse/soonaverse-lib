@@ -1,6 +1,6 @@
 import { COL, SUB_COL } from "@soonaverse/model";
 import { SoonSpace } from "../../src";
-import admin, { connect } from "../setup";
+import admin, { connectSoon } from "../setup";
 import { uuid } from "../utils/common.utils";
 
 describe("Space test", () => {
@@ -10,7 +10,7 @@ describe("Space test", () => {
   const guardian = { name: "guardian", uid: uuid() };
 
   beforeAll(async () => {
-    connect();
+    connectSoon();
     repo = new SoonSpace();
     await admin.firestore().doc(`${COL.SPACE}/${space.uid}`).create(space);
     await admin

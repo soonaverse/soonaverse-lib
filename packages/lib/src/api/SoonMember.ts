@@ -7,7 +7,9 @@ export class SoonMember extends FirestoreCrudRepository<Member> {
     super(COL.MEMBER);
   }
 
-  public create = callFirebaseFunction(WEN_FUNC.cMemberNotExists);
+  public create = callFirebaseFunction<Member | undefined, string>(
+    WEN_FUNC.cMemberNotExists
+  );
 
-  public update = callFirebaseFunction(WEN_FUNC.uMember);
+  public update = callFirebaseFunction<Member | undefined>(WEN_FUNC.uMember);
 }

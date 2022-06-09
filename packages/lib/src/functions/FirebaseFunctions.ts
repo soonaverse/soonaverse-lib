@@ -73,15 +73,15 @@ export const enum WEN_FUNC {
 }
 
 export const callFirebaseFunction =
-  (func: WEN_FUNC) =>
-  async <Res>(req: WenRequest) => {
+  <Response, Request = WenRequest>(func: WEN_FUNC) =>
+  async (req: Request) => {
     const connection = Soonaverse.getFunctionsConnection();
     if (!connection) {
       throw new Error(
         "Soonaverse is not connected. Please call Soonaverse.connect."
       );
     }
-    const callable = httpsCallable<WenRequest, Res>(connection, func);
+    const callable = httpsCallable<Request, Response>(connection, func);
     const response = await callable(req);
     return response.data;
   };

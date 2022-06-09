@@ -1,7 +1,7 @@
 import { COL, Notification } from "@soonaverse/model";
 import { FirestoreCrudRepository } from "../firestore/FirestoreCrudRepository";
 
-export class SoonNotificationRepository extends FirestoreCrudRepository<Notification> {
+export class SoonNotification extends FirestoreCrudRepository<Notification> {
   constructor() {
     super(COL.NOTIFICATION);
   }

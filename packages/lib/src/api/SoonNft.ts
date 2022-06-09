@@ -1,4 +1,5 @@
 import { COL, Nft, Transaction, TransactionType } from "@soonaverse/model";
+import { assertMaxLength } from "../firestore/FirestoreConnection";
 import { FirestoreCrudRepository } from "../firestore/FirestoreCrudRepository";
 import { callFirebaseFunction, WEN_FUNC } from "../functions/FirebaseFunctions";
 
@@ -19,7 +20,7 @@ export class SoonNft extends FirestoreCrudRepository<Nft> {
    * @returns
    */
   public async getByCollections(collectionIds: string[]): Promise<Nft[]> {
-    this.assertMaxLength(collectionIds);
+    assertMaxLength(collectionIds);
     const query = this._query(
       this.colRef(),
       this._where("hidden", "==", false),
@@ -51,7 +52,7 @@ export class SoonNft extends FirestoreCrudRepository<Nft> {
    * @returns - Array of all nfts.
    */
   public async getByIotaAddress(iotaAddresses: string[]): Promise<Nft[]> {
-    this.assertMaxLength(iotaAddresses);
+    assertMaxLength(iotaAddresses);
     const lowerCaseAddresses = iotaAddresses.map((i) => i.toLowerCase());
     const query = this._query(
       this._collection(this.db, COL.TRANSACTION),
@@ -75,15 +76,21 @@ export class SoonNft extends FirestoreCrudRepository<Nft> {
     return <Nft[]>result.filter((nft) => nft !== undefined);
   }
 
-  public create = callFirebaseFunction(WEN_FUNC.cNft);
+  public create = callFirebaseFunction<Nft | undefined>(WEN_FUNC.cNft);
 
-  public createBatch = callFirebaseFunction(WEN_FUNC.cBatchNft);
+  public createBatch = callFirebaseFunction<string[] | undefined>(
+    WEN_FUNC.cBatchNft
+  );
 
-  public reject = callFirebaseFunction(WEN_FUNC.rProposal);
+  public setForSale = callFirebaseFunction<Nft | undefined>(
+    WEN_FUNC.setForSaleNft
+  );
 
-  public setForSale = callFirebaseFunction(WEN_FUNC.setForSaleNft);
-  
-  public order = callFirebaseFunction(WEN_FUNC.orderNft);
+  public order = callFirebaseFunction<Transaction | undefined>(
+    WEN_FUNC.orderNft
+  );
 
-  public openBid = callFirebaseFunction(WEN_FUNC.openBid);
+  public openBid = callFirebaseFunction<Transaction | undefined>(
+    WEN_FUNC.openBid
+  );
 }

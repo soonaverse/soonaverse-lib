@@ -1,5 +1,6 @@
 import { COL, Transaction, TransactionType } from "@soonaverse/model";
 import { Observable } from "rxjs";
+import { assertNotLite } from "../firestore/FirestoreConnection";
 import { FirestoreCrudRepository } from "../firestore/FirestoreCrudRepository";
 
 export class SoonTransaction extends FirestoreCrudRepository<Transaction> {
@@ -13,7 +14,7 @@ export class SoonTransaction extends FirestoreCrudRepository<Transaction> {
    * @return - Latest payment transaction
    */
   public onValidPayment(): Observable<Transaction[]> {
-    this.assertNotLite();
+    assertNotLite();
 
     return new Observable((observe) => {
       const query = this._query(

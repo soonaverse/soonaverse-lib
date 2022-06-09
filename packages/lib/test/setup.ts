@@ -9,7 +9,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as any),
 });
 
-export const connect = (lite = false) => {
+export const connectSoon = (lite = false) => {
   Soonaverse.connect(lite, "", projectId);
   expect(Soonaverse.isLiteMode()).toBe(lite);
 };

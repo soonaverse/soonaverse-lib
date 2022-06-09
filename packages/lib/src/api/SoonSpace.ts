@@ -29,25 +29,39 @@ export class SoonSpace extends FirestoreCrudRepository<Space> {
     return (await this._getDocs(query)).docs.map((d) => <Member>d.data());
   };
 
-  public create = callFirebaseFunction(WEN_FUNC.cSpace);
+  public create = callFirebaseFunction<Space | undefined>(WEN_FUNC.cSpace);
 
-  public update = callFirebaseFunction(WEN_FUNC.uSpace);
+  public update = callFirebaseFunction<Space | undefined>(WEN_FUNC.uSpace);
 
-  public join = callFirebaseFunction(WEN_FUNC.joinSpace);
+  public join = callFirebaseFunction<Space | undefined>(WEN_FUNC.joinSpace);
 
-  public leave = callFirebaseFunction(WEN_FUNC.leaveSpace);
+  public leave = callFirebaseFunction<Space | undefined>(WEN_FUNC.leaveSpace);
 
-  public blockMember = callFirebaseFunction(WEN_FUNC.blockMemberSpace);
+  public blockMember = callFirebaseFunction<Space | undefined>(
+    WEN_FUNC.blockMemberSpace
+  );
 
-  public unblockMember = callFirebaseFunction(WEN_FUNC.unblockMemberSpace);
+  public unblockMember = callFirebaseFunction<Space | undefined>(
+    WEN_FUNC.unblockMemberSpace
+  );
 
-  public acceptMember = callFirebaseFunction(WEN_FUNC.acceptMemberSpace);
+  public acceptMember = callFirebaseFunction<Space | undefined>(
+    WEN_FUNC.acceptMemberSpace
+  );
 
-  public declineMember = callFirebaseFunction(WEN_FUNC.declineMemberSpace);
+  public declineMember = callFirebaseFunction<Space | undefined>(
+    WEN_FUNC.declineMemberSpace
+  );
 
-  public addGuardian = callFirebaseFunction(WEN_FUNC.addGuardianSpace);
+  public addGuardian = callFirebaseFunction<Space | undefined>(
+    WEN_FUNC.addGuardianSpace
+  );
 
-  public removeGuardian = callFirebaseFunction(WEN_FUNC.removeGuardianSpace);
+  public removeGuardian = callFirebaseFunction<Space | undefined>(
+    WEN_FUNC.removeGuardianSpace
+  );
 
-  public setAlliance = callFirebaseFunction(WEN_FUNC.setAlliance);
+  public setAlliance = callFirebaseFunction<Space | undefined>(
+    WEN_FUNC.setAlliance
+  );
 }

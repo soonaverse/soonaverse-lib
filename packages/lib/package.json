@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc --build tsconfig.prod.json",
     "prepare": "tsc --build tsconfig.prod.json",
-    "test": "jest --forceExit",
+    "test": "jest SoonMember.spec.ts --forceExit",
     "serve": "firebase -c ./test/firebase.json emulators:start --only firestore,ui"
   },
   "dependencies": {
