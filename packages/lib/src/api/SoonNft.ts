@@ -39,7 +39,7 @@ export class SoonNft extends FirestoreCrudRepository<Nft> {
     const query = this._query(
       this.colRef(),
       this._where("hidden", "==", false),
-      this._where("owner", "==", ethAddress.toLowerCase())
+      this._where("owner", "==", ethAddress)
     );
     const snapshot = await this._getDocs(query);
     return snapshot.docs.map((d) => <Nft>d.data());
@@ -53,10 +53,9 @@ export class SoonNft extends FirestoreCrudRepository<Nft> {
    */
   public async getByIotaAddress(iotaAddresses: string[]): Promise<Nft[]> {
     assertMaxLength(iotaAddresses);
-    const lowerCaseAddresses = iotaAddresses.map((i) => i.toLowerCase());
     const query = this._query(
       this._collection(this.db, COL.TRANSACTION),
-      this._where("payload.sourceAddress", "in", lowerCaseAddresses),
+      this._where("payload.sourceAddress", "in", iotaAddresses),
       this._where("type", "==", TransactionType.PAYMENT),
       this._where("payload.invalidPayment", "==", false)
     );
