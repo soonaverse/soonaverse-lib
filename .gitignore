@@ -1,6 +1,6 @@
-*.log
-.DS_Store
 node_modules
 dist
-js-lib/package-lock.json
-package-lock.json
+npm-debug.log
+packages/*/dist
+.idea
+**/*.log
