@@ -2,6 +2,14 @@
 
 Import this module to access all the schemas (interfaces) used by Soonaverse to represent data in the database
 
+## Getting Started
+
+### NPM Package
+Install NPM package
+```
+npm install @soonaverse/model --save
+```
+
 ## Contributing
 
 ### Contributing Guidelines
