@@ -1,5 +1,5 @@
 {
-  "name": "@soonaverse/credentials",
+  "name": "@soonaverse/auth",
   "version": "1.0.0",
   "author": "Boldizsar Mezei <boldizsar.a.mezei@toptal.com>",
   "license": "Apache-2.0",
@@ -13,6 +13,13 @@
   ],
   "scripts": {
     "build": "tsc",
-    "prepare": "tsc"
+    "prepare": "tsc",
+    "test": "jest --forceExit"
+  },
+  "dependencies": {
+    "@metamask/detect-provider": "^1.2.0",
+    "@soonaverse/credentials": "^1.0.0",
+    "@soonaverse/model": "^1.0.0",
+    "firebase": "^9.8.3"
   }
 }

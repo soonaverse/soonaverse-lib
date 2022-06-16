@@ -4,7 +4,7 @@ import { callFirebaseFunction, WEN_FUNC } from "../functions/FirebaseFunctions";
 
 export class SoonToken extends FirestoreCrudRepository<Token> {
   constructor() {
-    super(COL.SPACE);
+    super(COL.TOKEN);
   }
 
   public create = callFirebaseFunction<Token | undefined>(WEN_FUNC.cToken);

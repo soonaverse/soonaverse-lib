@@ -2,7 +2,7 @@
   "name": "@soonaverse/lib",
   "version": "1.0.0",
   "author": "Boldizsar Mezei <boldizsar.a.mezei@toptal.com>",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
